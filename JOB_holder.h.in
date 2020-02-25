@@ -1,3 +1,11 @@
 
 #define JobPM_VERSION_MAJOR @JobPM_VERSION_MAJOR@
 #define JobPM_VERSION_MINOR @JobPM_VERSION_MINOR@
+
+class JOB_holder
+{
+public:
+	JOB_holder();
+	~JOB_holder();
+private:
+};
