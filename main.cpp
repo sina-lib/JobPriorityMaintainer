@@ -15,6 +15,6 @@ int main(int argc, char* argv[])
 	std::cout << std::put_time(std::localtime(&nt),"%c") << std::endl;
 
 
-	JOB_holder a;
+	JOB_holder a{"rjobs/hw"};
 	return 0;
 }
