@@ -10,6 +10,8 @@ using json = nlohmann::json;
 
 size_t JOB_holder::count_unknowns{0};
 
+// Constructors and destructors -----------------------------------------------------------
+
 JOB_holder::JOB_holder() : periodic{false} , isRegistered{false} // default constructor
 {
 	std::cout << "default JOB constructor" << std::endl;
@@ -29,15 +31,19 @@ JOB_holder::JOB_holder(const char* add) : isRegistered{true}
 				content += a;
 				}*/
 		json myJob{};
-		g >> myJob;
-		std::cout << myJob["name"] << std::endl;
-		// got to deseriallize it
+		g >> myJob; // read and deserillize
+		this->name = std::string(myJob["name"]);
+		this->description = std::string(myJob["description"]);
+		this->periodic = myJob["periodic"] == 1 ? true : false;
+		this->reward = myJob["reward"];
 		g.close();
 	}
 	else
 	{
 		std::cout << "problem loading a JOB: cannot open the file:" << add << std::endl;
 		// TODO: throw an exception !!!
+		isRegistered = false;
+		this->name = std::string("Unknown job _" + std::to_string(count_unknowns++));
 	}
 }
 
@@ -48,7 +54,23 @@ JOB_holder::~JOB_holder() // destructor
 }
 
 
+bool JOB_holder::saveJob(const char* address)
+{
+	std::ofstream g{address, std::ios};
+	if (g)
+	{
+		json theJob{};
+		theJob["name"] = this->name;
+		theJob["description"] = this->description;
+		theJobp["periodic"] = (this->periodic) ? 1 : 0;
+		g << theJob; // serilize and write it
+		g.close();
+		return true;
+	}
+	return false;
+}
 
+// GET SETs ---------------------------------------------------------------------------
 void JOB_holder::setDescription(const std::string& desc)
 {
 	this->description = desc;
