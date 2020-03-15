@@ -4,6 +4,8 @@
 #include <chrono>
 #include <optional>
 #include <fstream>
+#include <sstream>
+#include <chrono>
 #include "json.hpp"
 
 using json = nlohmann::json;
@@ -36,6 +38,10 @@ JOB_holder::JOB_holder(const char* add) : isRegistered{true}
 		this->description = std::string(myJob["description"]);
 		this->periodic = myJob["periodic"] == 1 ? true : false;
 		this->reward = myJob["reward"];
+		std::istringstream ddl{std::string(myJob["deadline"])};
+		std::time_t deadL;
+		ddl >> deadL;
+		this->deadline = std::chrono::system_clock::from_time_t(deadL);
 		g.close();
 	}
 	else
@@ -56,13 +62,21 @@ JOB_holder::~JOB_holder() // destructor
 
 bool JOB_holder::saveJob(const char* address)
 {
-	std::ofstream g{address, std::ios};
+	std::ofstream g{address};
 	if (g)
 	{
 		json theJob{};
 		theJob["name"] = this->name;
 		theJob["description"] = this->description;
-		theJobp["periodic"] = (this->periodic) ? 1 : 0;
+		theJob["periodic"] = (this->periodic) ? 1 : 0;
+		auto ddl = std::chrono::system_clock::to_time_t(this->deadline);
+		std::ostringstream j;
+		j << ddl;
+		
+		theJob["deadline"] = j.str();
+		j.clear();
+		j << this->job_repeat_duration.count();
+		theJob["period"] = j.str() + std::string(" mins");
 		g << theJob; // serilize and write it
 		g.close();
 		return true;
