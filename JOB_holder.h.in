@@ -26,6 +26,8 @@ private:
 	bool periodic;
 	bool isRegistered; // is this object loaded?
 	std::chrono::minutes job_repeat_duration;
-	std::chrono::system_clock::time_point deadline;
+	std::chrono::system_clock::time_point deadline; // when not periodic, use this as an origin sign
 	float reward;
+
+	void updateDeadlineInCaseOfPeriodic(void);
 };

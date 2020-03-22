@@ -100,15 +100,28 @@ std::optional<std::chrono::minutes> JOB_holder::getRemainingTime()
 {
 	if (!isRegistered) return std::nullopt;
 	
-	auto n = std::chrono::system_clock::now();
-
+	auto now_time = std::chrono::system_clock::now();
+	std::chrono::minutes remTime{0};
+	
+	
 	if (periodic)
-	{
-	}
-	else
-	{
-	}
+		this->updateDeadlineInCaseOfPeriodic();
+	
+	remTime = std::chrono::duration_cast<std::chrono::minutes>( this->deadline - now_time );
 
-	return std::nullopt;
+	return remTime;
+}
+
+void JOB_holder::updateDeadlineInCaseOfPeriodic(void)
+{
+	auto now_time = std::chrono::system_clock::now();
+	auto interv = std::chrono::duration_cast<std::chrono::minutes> (now_time - this->deadline);
+	
+	while (interv.count() < 0)
+	{
+		// we have passed last deadline, adding Period untill this becomes positive
+		this->deadline += this->job_repeat_duration;
+		auto interv = std::chrono::duration_cast<std::chrono::minutes> (now_time - this->deadline);
+	}
 }
 
