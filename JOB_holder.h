@@ -10,7 +10,8 @@ class JOB_holder
 public:
 	JOB_holder(); // default constructor
 	JOB_holder(const char* addressName); // load this job from an JSON file with the given address
-	JOB_holder(const std::string& name,const std::chrono::system_clock::time_point& deadline);
+	JOB_holder(const std::string& address);
+	JOB_holder(const std::string& name,const std::chrono::system_clock::time_point& deadline, const float reward = 1.0);
 	~JOB_holder(); // destructor
 	
 	
