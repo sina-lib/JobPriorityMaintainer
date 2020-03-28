@@ -13,12 +13,16 @@ public:
 	JOB_holder(const std::string& address);
 	JOB_holder(const std::string& name,const std::chrono::system_clock::time_point& deadline, const float reward = 1.0);
 	~JOB_holder(); // destructor
+
 	
-	
+	std::optional<bool> loadJob(const char* address);
+	std::optional<bool> loadJob(const std::string& address);
+	bool getRegisteration(void) const;
 	bool saveJob(const char* address); // save the current Jon as a JSON into the file address
 	std::optional<std::chrono::minutes> getRemainingTime();
 	void setDescription(const std::string&);
 	void getNameDescription(std::string& name, std::string& description);
+	
 	
 private:
 	static size_t count_unknowns;

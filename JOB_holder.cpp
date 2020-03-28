@@ -102,7 +102,20 @@ bool JOB_holder::saveJob(const char* address)
 	return false;
 }
 
+
+std::optional<bool> JOB_holder::loadJob(const std::string& address)
+{
+	// TODO
+	return std::nullopt;
+}
+
+std::optional<bool> JOB_holder::loadJob(const char* add)
+{
+	return this->loadJob(std::string(add));
+}
 // GET SETs ---------------------------------------------------------------------------
+bool JOB_holder::getRegisteration(void) const { return this->isRegistered; };
+
 void JOB_holder::setDescription(const std::string& desc)
 {
 	this->description = desc;
