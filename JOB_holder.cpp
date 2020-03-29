@@ -106,6 +106,39 @@ bool JOB_holder::saveJob(const char* address)
 std::optional<bool> JOB_holder::loadJob(const std::string& address)
 {
 	// TODO
+	std::ifstream g{address};
+	if (g)
+	{
+		/*std::string content{};
+		std::string a{};
+		while (!g.eof())
+		{
+			if (g >> a)
+				content += a;
+				}*/
+		//try {
+		json myJob{};
+		g >> myJob; // read and deserillize
+		this->name = std::string(myJob["name"]);
+		this->description = std::string(myJob["description"]);
+		this->periodic = myJob["periodic"] == true;
+		this->reward = myJob["reward"];
+		std::istringstream ddl{std::string(myJob["deadline"])};
+		std::time_t deadL;
+		ddl >> deadL; // should read the deadline as an epoch on seconds basis
+		this->deadline = std::chrono::system_clock::from_time_t(deadL); // change it to time_point
+		//}
+		g.close();
+		return true;
+	}
+	else
+	{
+		std::cout << "problem loading a JOB: cannot open the file:" << add << std::endl;
+		// TODO: throw an exception !!!
+		isRegistered = false;
+		this->name = std::string("Unknown_job_" + std::to_string(count_unknowns++));
+		return false;
+	}
 	return std::nullopt;
 }
 
