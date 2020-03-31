@@ -43,6 +43,11 @@ JOB_holder::JOB_holder(const std::string& add) : isRegistered{true} // read from
 		std::time_t deadL;
 		ddl >> deadL; // should read the deadline as an epoch on seconds basis
 		this->deadline = std::chrono::system_clock::from_time_t(deadL); // change it to time_point
+		ddl.str(myJob["period"]);
+		ddl.clear();
+		long int per_mins{};
+		ddl >> per_mins;
+		this->job_repeat_duration = std::chrono::minutes(per_mins);
 		//}
 		g.close();
 	}
@@ -90,10 +95,12 @@ bool JOB_holder::saveJob(const char* address)
 		theJob["deadline"] = j.str();
 
 		// insert repeat duration as of minustes
+		j.str("");
 		j.clear();
-		j << this->job_repeat_duration.count(); // repeat is a simple long expressing minutes
-		theJob["period"] = j.str() + std::string(" mins");
-		
+		j << this->job_repeat_duration.count() << " mins";//repeat is a simple long expressing minutes
+		theJob["period"] = j.str();
+        //theJob["period"] = std::to_string(this->job_repeat_duration.count()) + std::string(" mins");
+												  
 		theJob["reward"] = this->reward;
 		g << theJob; // serilize and write it
 		g.close();
@@ -105,17 +112,9 @@ bool JOB_holder::saveJob(const char* address)
 
 std::optional<bool> JOB_holder::loadJob(const std::string& address)
 {
-	// TODO
 	std::ifstream g{address};
 	if (g)
 	{
-		/*std::string content{};
-		std::string a{};
-		while (!g.eof())
-		{
-			if (g >> a)
-				content += a;
-				}*/
 		//try {
 		json myJob{};
 		g >> myJob; // read and deserillize
@@ -123,17 +122,25 @@ std::optional<bool> JOB_holder::loadJob(const std::string& address)
 		this->description = std::string(myJob["description"]);
 		this->periodic = myJob["periodic"] == true;
 		this->reward = myJob["reward"];
+
 		std::istringstream ddl{std::string(myJob["deadline"])};
 		std::time_t deadL;
 		ddl >> deadL; // should read the deadline as an epoch on seconds basis
 		this->deadline = std::chrono::system_clock::from_time_t(deadL); // change it to time_point
+
+		ddl.str(std::string(myJob["period"]));
+		ddl.clear();
+		long int mins;
+		ddl >> mins;
+		this->job_repeat_duration = std::chrono::minutes(mins);
 		//}
 		g.close();
+		this->isRegistered = true;
 		return true;
 	}
 	else
 	{
-		std::cout << "problem loading a JOB: cannot open the file:" << add << std::endl;
+		std::cout << "problem loading a JOB: cannot open the file:" << address << std::endl;
 		// TODO: throw an exception !!!
 		isRegistered = false;
 		this->name = std::string("Unknown_job_" + std::to_string(count_unknowns++));

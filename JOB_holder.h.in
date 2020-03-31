@@ -36,3 +36,11 @@ private:
 
 	void updateDeadlineInCaseOfPeriodic(void);
 };
+
+
+/*
+  the convention:
+  periodic : deadline shall be treated as the next deadline, and can be updated using
+             the job_repeat_duration
+  non periodic : the deadline is a one-shot deadline.
+ */

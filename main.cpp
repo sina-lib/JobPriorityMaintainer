@@ -53,6 +53,7 @@ int main(int argc, char* argv[])
 		std::cin >> nm;
 		JOB_holder something{nm};
 
+		
 		std::optional<std::chrono::minutes> rt = something.getRemainingTime();
 		if (rt)
 		{
