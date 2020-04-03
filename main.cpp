@@ -5,11 +5,12 @@
 #include <chrono>
 #include "Validator.hpp"
 
+
 inline void print(const std::string& matn)
 {
 	std::cout << matn << std::endl;
 }
-
+#include "JOB_test_helper.cpp"
 
 int main(int argc, char* argv[])
 {
@@ -19,6 +20,7 @@ int main(int argc, char* argv[])
 
 	Validator<int> getValidInt{std::cin, std::cout};
 
+	doSomeTests();
 	print("save(s) or load(l)? ");
 	char t;
 	std::cin >> t;
