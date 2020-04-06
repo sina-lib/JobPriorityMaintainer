@@ -5,12 +5,12 @@ project(JobPM VERSION 0.5)
 
 # get the version value
 configure_file(JOB_holder.h.in JOB_holder.h)
-
+configure_file(TimeUtility.h.in TimeUtility.h)
 
 # setup c++ version
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 #add the exexutable
-add_executable(JPM main.cpp JOB_holder.cpp)
+add_executable(JPM main.cpp JOB_holder.cpp TimeUtility.cpp)
 

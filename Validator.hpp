@@ -15,9 +15,14 @@ public:
 			{
 				is.clear();
 				is.ignore( std::numeric_limits<std::streamsize>::max() , '\n');
-				os << "--Bad input\n" ;
+				os << "--Bad input format\n" ;
 			}
 			is.ignore( std::numeric_limits<std::streamsize>::max() , '\n');
+			return *this;
+		};
+	Validator& operator() (const char* msg)
+		{
+			std::cout << msg;
 			return *this;
 		};
 private:
