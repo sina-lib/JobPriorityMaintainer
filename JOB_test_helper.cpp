@@ -45,14 +45,20 @@ void doSomeTests()
 	Validator<std::string> getValidString{std::cin, std::cout};
 	Validator<int>         getValidInt   {std::cin, std::cout};
 	Validator<char>        getValidChar  {std::cin, std::cout};
-	
+	// note : Validator has an operator() function which gives gentle cout
+
+	// begin doing commands
  	while (true)
 	{
 		auto now = std::chrono::system_clock::now();
+		// print current time
 		std::time_t now_time_t = std::chrono::system_clock::to_time_t(now);
 		for (size_t i{}; i < 30 ; i++) std::cout << "--";
 		std::cout << "It's  >>>  " << std::ctime(&now_time_t);
-			
+
+		testGetCurrentDayTimeFunction();
+		return ;
+		//std::cout << "some rounded time : " <<  << std::endl;
 		// list of available commands
 		std::cout << "L\tload a job, show deadline" << std::endl;
 		std::cout << "C\tcreate  a job" << std::endl;
@@ -62,8 +68,10 @@ void doSomeTests()
 		JOB_TST_CMD cmd = getACmd();
 
 		// do it
-		switch (cmd )
+		switch ( cmd )
 		{
+
+		// =============================================================================
 		case JOB_TST_CMD::JT_CREATE:
 		{
 			std::cout << "creating a job:" << std::endl;
@@ -80,16 +88,20 @@ void doSomeTests()
 			}
 			else
 			{
-				// a single deadline job
+				// a single deadline type job
 				// get the deadline
 				int durations{};
 				getValidInt("How many days from now on? ") >> durations;
 				auto deadLine = getCurrentDayTime();
+				std::time_t hyperX {std::chrono::system_clock::to_time_t(deadLine)};
+				std::cout << "todays time has been rounded: " << std::ctime(&hyperX) << std::endl;
 				deadLine += std::chrono::hours(24*durations);
 				
 			}
 			break;
 		}
+
+		// ====================================================================================
 		case JOB_TST_CMD::JT_LOAD:
 		{
 			std::cout << "lets load a job" << std::endl;

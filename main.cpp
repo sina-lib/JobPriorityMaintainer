@@ -21,6 +21,7 @@ int main(int argc, char* argv[])
 	Validator<int> getValidInt{std::cin, std::cout};
 
 	doSomeTests();
+	return 0;
 	print("save(s) or load(l)? ");
 	char t;
 	std::cin >> t;
