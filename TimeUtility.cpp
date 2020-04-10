@@ -52,4 +52,13 @@ void testGetCurrentDayTimeFunction(void)
 	}
 }
 
-// ------------------------- Time Utilitu -----------------------------
+std::string getStringFromTimePoint(const std::chrono::system_clock::time_point& tim)
+{
+	std::time_t gg = std::chrono::system_clock::to_time_t(tim);
+	std::string res = std::ctime(&gg);
+	res.erase(res.end()-1);
+	return res;
+}
+
+
+// ------------------------- Time Utility -----------------------------

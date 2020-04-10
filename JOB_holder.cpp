@@ -14,12 +14,15 @@ size_t JOB_holder::count_unknowns{0};
 
 // Constructors and destructors -----------------------------------------------------------
 
+// neither load nor create - Bare JOB -----------------------------------------------------
 JOB_holder::JOB_holder() : periodic{false} , isRegistered{false} // default constructor
 {
 	std::cout << "default JOB constructor" << std::endl;
 	this->name = "Unknown job _" + std::to_string(count_unknowns++);
 }
 
+// ===================================== LOADERS =====================================
+// load a JOB from given address ---------------------------------------------------------
 JOB_holder::JOB_holder(const std::string& add) : isRegistered{true} // read from file
 {
 	std::ifstream g{add};
@@ -60,19 +63,42 @@ JOB_holder::JOB_holder(const std::string& add) : isRegistered{true} // read from
 	}
 }
 
+// load a job from file ---------------------------------------------------------------------------
 JOB_holder::JOB_holder (const char* address) : JOB_holder(std::string(address))
 {
 }
 
-JOB_holder::JOB_holder(const std::string& Name, const std::chrono::system_clock::time_point& deadLine, const float rew): name{Name} , deadline{deadLine} , description{""} , periodic{false} , isRegistered{true} , reward{rew}
+// ==================================== CREATORS =========================================
+// One shot deadline JOB constructor ---------------------------------------------------------------
+JOB_holder::JOB_holder(const std::string& Name, const std::chrono::system_clock::time_point& deadLine, const double rew): name{Name} , deadline{deadLine} , description{""} , periodic{false} , isRegistered{true} , reward{rew}
 {
 	std::time_t dead {std::chrono::system_clock::to_time_t(deadLine)};
 	std::cout << "created a Job with name: " << Name << " & deadline: " << std::ctime(&dead) << std::endl;
 }
 
+// Periodic JOB constructor -----------------------------------------------------------
+JOB_holder::JOB_holder(const std::string& name_, const std::chrono::minutes& repDuration, const double rew ) : periodic{true} , isRegistered{true} , name{name_} , reward{rew} ,
+	    job_repeat_duration{repDuration}
+{
+	// TODO : check if it is a correct one
+	
+	std::cout << "Created a Periodic JOB with name " << name << std::endl;
+	int mins {static_cast<int> (repDuration.count())};
+	int days {mins / (24*60)};
+	int hours {mins % (24*60)};
+	hours /= (60);
+	mins = mins % 60;
+	std::cout << "Duration : " << days << " days and " << hours << " hours and " << mins << " minutes." << std::endl;
+	this->deadline = std::chrono::system_clock::now();
+	updateDeadlineInCaseOfPeriodic();
+}
+
+// Destruct a JOB --------------------------------------------------------------------------------
 JOB_holder::~JOB_holder() // destructor
 {
+	// take care of trivial JOBs
 	if (!isRegistered && count_unknowns > 0) count_unknowns--;
+	// warn the user
 	std::cout << "a JOB holder (" << name << ") deleted." << std::endl ;
 }
 
@@ -167,6 +193,8 @@ void JOB_holder::getNameDescription(std::string& nam, std::string& desc)
 	desc = this->description;
 }
 
+// -----------------------------------------------------------------------------------------
+// Remaining time for the next deadline of this job (wether it is a period one or one-shot)
 std::optional<std::chrono::minutes> JOB_holder::getRemainingTime()
 {
 	if (!isRegistered) return std::nullopt;
@@ -183,6 +211,9 @@ std::optional<std::chrono::minutes> JOB_holder::getRemainingTime()
 	return remTime;
 }
 
+
+// ---------------------------------------------------------------------------------
+// this is a private method , it is internally used
 void JOB_holder::updateDeadlineInCaseOfPeriodic(void)
 {
 	auto now_time = std::chrono::system_clock::now();
@@ -196,3 +227,40 @@ void JOB_holder::updateDeadlineInCaseOfPeriodic(void)
 	}
 }
 
+
+// print all the information of this job -----------------------------------------
+void JOB_holder::prettyPrintThisJob(void)
+{
+	
+	using std::cout;
+	using std::endl;
+	if (isRegistered)
+	{
+		cout << "Details of a " << ((periodic) ? "periodic " : "one-shot ") << " JOB is as following:"  << endl;
+		cout << "name:        " << this->name << endl;
+		cout << "description: " << description << endl;
+		cout << "reward after completion: " << this->reward << endl;
+		if (periodic)
+		{
+			// show the period
+			cout << "Period : " << job_repeat_duration.count() << " minutes, ";
+			auto inHours= std::chrono::duration_cast<std::chrono::hours>(job_repeat_duration).count();
+		    cout << "which is " << (inHours / 24) << " days and " << (inHours % 24) << " hours." << endl; 
+			// show the remainig time until next due
+		}
+		else
+		{
+			// show the deadline, and remaining time
+			std::optional<std::chrono::minutes> rem = getRemainingTime();
+			if (!rem) cout << "what the fuck? the job is registered, but cann't get the remaining time!" << endl;
+			int x = rem->count();
+			int days {x / (24*60)};
+			cout << "remaining time in minutes: " << x << endl;
+			cout << "remaining time of this job is " << days << " days and " << (x % (24*60)) / 60 << "hours and " << (x % 60) << " minutes." << endl;
+		}
+	}
+	else
+	{
+		cout << "warning: this job is not registered!" << endl;
+	}
+}
