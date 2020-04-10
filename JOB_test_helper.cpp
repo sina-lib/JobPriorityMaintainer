@@ -158,10 +158,37 @@ void doSomeTests()
 		{
 			std::cout << "lets load a job" << std::endl;
 			std::string add{};
-			std::cout << "enter a correct address: "; 
-			std::cin >> add;
+			Validator<std::string> getValidString {std::cin, std::cout };
 
-			JOB_holder job{add};
+			// get the address
+			getValidString("Enter a valid address: ") >> add;
+			
+			JOB_holder job{add}; // try to load it
+
+			if (job.getRegisteration())
+			{
+				std::cout << "Load done." << std::endl;
+
+				job.prettyPrintThisJob();
+
+				std::optional<std::chrono::minutes> x = job.getRemainingTime();
+				if (!x)
+				{
+					std::cout << "there is a problem geting the remaining time" << std::endl;
+				}
+				else
+				{
+					int remMins = static_cast<int> (x->count());
+					int remDays {remMins / (24*60)};
+					int rH {(remMins % (24*60)) / 60};
+					std::cout << "Remaining time till next deadline is: " << remMins << " minutes" << std::endl;
+																									  std::cout << "Which is " << remDays << " days, " << rH << " hours and "  << "" << std::endl;
+				}
+			}
+			else
+			{
+				std::cout << "Loading failed." << std::endl;
+			}
 			
 			break;
 		}
