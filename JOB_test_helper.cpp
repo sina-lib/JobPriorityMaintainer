@@ -181,8 +181,9 @@ void doSomeTests()
 					int remMins = static_cast<int> (x->count());
 					int remDays {remMins / (24*60)};
 					int rH {(remMins % (24*60)) / 60};
+					
 					std::cout << "Remaining time till next deadline is: " << remMins << " minutes" << std::endl;
-																									  std::cout << "Which is " << remDays << " days, " << rH << " hours and "  << "" << std::endl;
+				    std::cout << "Which is " << remDays << " days, " << rH << " hours and "  << (remMins % 60) << " minutes." << std::endl;
 				}
 			}
 			else
