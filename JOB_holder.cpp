@@ -26,6 +26,7 @@ JOB_holder::JOB_holder() : periodic{false} , isRegistered{false} // default cons
 JOB_holder::JOB_holder(const std::string& add) : isRegistered{true} // read from file
 {
 	std::ifstream g{add};
+	bool doUpdate{false};
 	if (g)
 	{
 		/*std::string content{};
@@ -44,15 +45,38 @@ JOB_holder::JOB_holder(const std::string& add) : isRegistered{true} // read from
 		this->reward = myJob["reward"];
 		std::istringstream ddl{std::string(myJob["deadline"])};
 		std::time_t deadL;
-		ddl >> deadL; // should read the deadline as an epoch on seconds basis
+		ddl >> deadL; // should read the deadline as an epoch on seconds basis (extracts one long int from the string)
 		this->deadline = std::chrono::system_clock::from_time_t(deadL); // change it to time_point
 		ddl.str(myJob["period"]);
-		ddl.clear();
+		ddl.clear(); // clear the error bits
 		long int per_mins{};
 		ddl >> per_mins;
 		this->job_repeat_duration = std::chrono::minutes(per_mins);
+
+		// check to see if the file must be updated
+		if (periodic) // in case of a periodic, the deadline should always be tuned to the next
+		{
+			auto rem = this->getRemainingTime();
+			if (rem->count() < 0 )
+			{
+				std::cout << "Warning: this is periodic JOB and its' next deadline is out of date." << std::endl;
+				doUpdate = true;
+			}
+		}
 		//}
 		g.close();
+		if (doUpdate)
+		{
+			std::cout << "Going to update the JOB's deadline given the period..." << std::endl;
+			// first, correct the next deadline;
+			this->updateDeadlineInCaseOfPeriodic();
+			
+			// we have the address
+			if (this->saveJob(add.data()))
+				std::cout << "the " << name << " JOB's next deadline updated and saved new one." << std::endl;
+			else
+				std::cout << "there is problem saving a JOB (" << name << ")"  << std::endl;
+		}
 	}
 	else
 	{
@@ -197,7 +221,7 @@ void JOB_holder::getNameDescription(std::string& nam, std::string& desc)
 // Remaining time for the next deadline of this job (wether it is a period one or one-shot)
 std::optional<std::chrono::minutes> JOB_holder::getRemainingTime()
 {
-	if (!isRegistered) return std::nullopt;
+	if (!isRegistered) return std::nullopt; // to avoid calling on an un-initiallized JOB
 	
 	auto now_time = std::chrono::system_clock::now();
 	std::chrono::minutes remTime{0};
@@ -236,6 +260,8 @@ void JOB_holder::prettyPrintThisJob(void)
 	using std::endl;
 	if (isRegistered)
 	{
+		for (size_t i{}; i<25; i++) cout << "==" ;
+		cout << endl;
 		cout << "Details of a " << ((periodic) ? "periodic " : "one-shot ") << " JOB is as following:"  << endl;
 		cout << "name:        " << this->name << endl;
 		cout << "description: " << description << endl;

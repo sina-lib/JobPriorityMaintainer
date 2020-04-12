@@ -16,9 +16,8 @@ int main(int argc, char* argv[])
 {
 
 	std::string name;
-	std::chrono::system_clock::time_point dead {std::chrono::system_clock::now()};
 
-	Validator<int> getValidInt{std::cin, std::cout};
+
 
 	doSomeTests();
 	
