@@ -15,11 +15,9 @@ inline void print(const std::string& matn)
 int main(int argc, char* argv[])
 {
 
-	std::string name;
-
-
-
-	doSomeTests();
+	
+	
+	
 	
 	std::cout << "SiNa" << std::endl;
 	return 0;
